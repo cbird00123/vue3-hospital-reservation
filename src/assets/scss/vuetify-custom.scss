@@ -1,0 +1,72 @@
+@import './valiables.scss';
+
+.v-window {
+  height: 100%;
+  &.v-stepper-window {
+    margin: 10px 5px;
+    height: calc(100% - 172px);
+    @media screen and (max-width: 1080px) {
+      height: calc(100% - 150px);
+    }
+    @media screen and (max-width: 640px) {
+      height: calc(100% - 170px);
+    }
+  }
+}
+
+.v-label {
+  width: 100%;
+}
+
+.v-stepper-header {
+  padding: 0 10px;
+  @media screen and (max-width: 340px) {
+    padding: 0;
+  }
+  .v-stepper-item {
+    @media screen and (max-width: 1080px) {
+      padding: 1.5rem 0;
+      flex-basis: unset;
+      min-width: 55px;
+
+      .v-stepper-item__title {
+        font-size: 0.9rem;
+      }
+    }
+    @media screen and (max-width: 480px) {
+      padding: 1rem 0;
+      flex-basis: unset;
+      min-width: 50px;
+
+      .v-stepper-item__title {
+        font-size: 0.7rem;
+      }
+    }
+    @media screen and (max-width: 340px) {
+      padding: 1rem 0;
+      flex-basis: unset;
+      min-width: 50px;
+
+      .v-stepper-item__title {
+        font-size: 0.6rem;
+      }
+    }
+    .v-avatar {
+      width: 20px !important;
+      height: 20px !important;
+    }
+  }
+  .v-divider{
+    display: none;
+  }
+}
+
+.v-btn {
+  &.primary {
+    background: map-get($map: $colors, $key: primary);
+    color: #ffffff;
+  }
+  &.secondary {
+    background: map-get($map: $colors, $key: secondary);
+  }
+}
