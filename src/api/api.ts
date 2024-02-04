@@ -4,9 +4,25 @@ interface loginParams {
   birth: string
 }
 
+let response: any = {}
+
+const decodeResponse = async (resBody) => {
+  const reader = resBody.getReader()
+  const decoder = new TextDecoder()
+
+  const decodeReadVal = (ch) => {
+    const chunk = decoder.decode(ch.value || new Uint8Array(), {
+      stream: !ch.done
+    })
+    response = JSON.parse(chunk)
+  }
+  await reader.read().then((res) => {
+    decodeReadVal(res)
+  })
+}
+
 const apis = {
   login: async (params: loginParams, siteCode) => {
-    let value = {}
     await fetch(
       `/api/auth/join/ssl/${siteCode}?patientNm=${params.patientNm}&telNum=${params.telNum}&birth=${params.birth}`,
       {
@@ -16,18 +32,9 @@ const apis = {
         }
         // body: JSON.stringify(params)
       }
-    ).then((response) => {
-      if (response.status === 200) {
-        const reader = response.body.getReader()
-        const decoder = new TextDecoder()
-
-        const decodeResponse = (ch) => {
-          const chunk = decoder.decode(ch.value || new Uint8Array(), {
-            stream: !ch.done
-          })
-          value = JSON.parse(chunk)
-        }
-        reader.read().then(decodeResponse)
+    ).then((res) => {
+      if (res.status === 200) {
+        decodeResponse(res.body)
       }
     })
   }
