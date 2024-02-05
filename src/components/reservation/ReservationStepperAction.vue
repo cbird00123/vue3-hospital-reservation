@@ -1,6 +1,6 @@
 <template>
   <v-stepper-actions
-    v-if="watchStep !== 6 && watchStep !== 1"
+    v-if="watchStep !== 6 && (watchStep !== 1 || isLogin)"
     :key="`action${watchStep}`"
   >
     <template #prev>
@@ -15,7 +15,9 @@
     </template>
   </v-stepper-actions>
   <div v-else class="primary_btn">
-    <v-btn class="primary" :ripple="false">{{ buttonText }}</v-btn>
+    <v-btn class="primary" :ripple="false" @click="activeButton">{{
+      buttonText
+    }}</v-btn>
   </div>
 </template>
 
@@ -26,10 +28,14 @@ const propsItem = defineProps({
   step: {
     type: Number,
     default: 1
+  },
+  isLogin: {
+    type: Boolean,
+    default: false
   }
 })
 
-const emit = defineEmits(['emitChangeStep'])
+const emit = defineEmits(['emitChangeStep', 'emitLogin'])
 const watchStep = ref(1)
 watch(propsItem, (newVal) => {
   watchStep.value = newVal.step
@@ -43,7 +49,15 @@ const changeStep = (type: string) => {
   }
 }
 
-const buttonText = ref<string>(propsItem.step === 1 ? '로그인' : '닫기')
+const buttonText = ref<string>(
+  propsItem.step === 1 && !propsItem.isLogin ? '로그인' : '닫기'
+)
+
+const activeButton = () => {
+  if (propsItem.step === 1 && !propsItem.isLogin) {
+    emit('emitLogin')
+  }
+}
 </script>
 
 <style lang="scss" scoped>
