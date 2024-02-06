@@ -1,6 +1,7 @@
 <template>
   <div id="app">
     <RouterView />
+    <Loading />
   </div>
 </template>
 

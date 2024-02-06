@@ -58,33 +58,18 @@ const stepTitle = <string[]>[
 const stepComponent = shallowRef([
   {
     step: 1,
-    refName: 'loginPage',
-    component: defineAsyncComponent(() => import('../common/Login.vue'))
-  },
-  {
-    step: 2,
-    refName: 'informationPage',
-    component: defineAsyncComponent(() => import('./step/StepInformation.vue'))
-  },
-  {
-    step: 3,
-    refName: 'interviewPage',
-    component: defineAsyncComponent(
-      () => import('./step/StepInterviewList.vue')
-    )
-  },
-  {
-    step: 4,
-    refName: 'doctorPage',
-    component: defineAsyncComponent(() => import('./step/StepDoctorList.vue'))
-  },
-  {
-    step: 5,
     refName: 'datePage',
     component: defineAsyncComponent(() => import('../common/DatePicker.vue'))
   },
   {
-    step: 6,
+    step: 1,
+    refName: 'cancelRevokePage',
+    component: defineAsyncComponent(
+      () => import('./step/StepCancelRevokePage.vue')
+    )
+  },
+  {
+    step: 2,
     refName: 'completePage',
     component: defineAsyncComponent(() => import('./step/StepComplete.vue'))
   }
@@ -103,32 +88,8 @@ const openDialog = () => {
   store.commit('setDialog', true)
   dialogKey.value += 1
 }
-const noneActionButton = ref<boolean>(true)
-const isLogin = ref<boolean>(false)
+const noneActionButton = ref<boolean>(false)
 const userInfo = ref<any>(JSON.parse(sessionStorage.getItem('userInfo')))
-if (sessionStorage.getItem('userInfo')) isLogin.value = true
-if (isLogin.value) {
-  stepTitle.shift()
-  stepComponent.value.shift()
-  noneActionButton.value = false
-}
-
-const loginParams = ref({
-  patientNm: '',
-  telNum: '',
-  birth: ''
-})
-
-const login = async () => {
-  await apis.login(loginParams.value, store.state.siteCode)
-  userInfo.value = JSON.parse(sessionStorage.getItem('userInfo'))
-  noneActionButton.value = false
-  step.value++
-}
-
-const doctorList = ref<any[]>([])
-
-const selectedDoctor = ref<any>({})
 
 const dateTime = ref<string>()
 

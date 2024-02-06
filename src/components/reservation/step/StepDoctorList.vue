@@ -1,6 +1,6 @@
 <template>
   <v-container fluid class="step-doctorList-list">
-    <v-radio-group v-model="selectItem" class="step-doctorList-list__box">
+    <v-radio-group v-model="selectDoctor" class="step-doctorList-list__box">
       <v-radio
         v-for="(item, index) in itemList"
         :key="`doctorList${index}`"
@@ -18,7 +18,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 
 const { doctorList } = defineProps({
   doctorList: {
@@ -28,8 +28,12 @@ const { doctorList } = defineProps({
 })
 
 const itemList = ref(doctorList)
-const selectItem = ref(itemList.value[0])
-console.log(itemList)
+const selectDoctor = ref(itemList.value[0])
+const emit = defineEmits(['emitSelectedDoctor'])
+emit('emitSelectedDoctor', selectDoctor.value)
+watch(selectDoctor, (newVal) => {
+  emit('emitSelectedDoctor', newVal)
+})
 </script>
 
 <style lang="scss" scoped>

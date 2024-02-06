@@ -1,8 +1,5 @@
 <template>
-  <v-stepper-actions
-    v-if="watchStep !== 6 && (watchStep !== 1 || isLogin)"
-    :key="`action${watchStep}`"
-  >
+  <v-stepper-actions v-if="!noneActionButton" :key="`action${watchStep}`">
     <template #prev>
       <v-btn class="step_btn secondary" @click="changeStep('down')">
         이전으로
@@ -10,7 +7,7 @@
     </template>
     <template #next>
       <v-btn class="step_btn primary" @click="changeStep('up')">
-        다음으로
+        {{ nextButtonText }}
       </v-btn>
     </template>
   </v-stepper-actions>
@@ -32,26 +29,43 @@ const propsItem = defineProps({
   isLogin: {
     type: Boolean,
     default: false
+  },
+  noneActionButton: {
+    type: Boolean,
+    default: false
   }
 })
 
-const emit = defineEmits(['emitChangeStep', 'emitLogin'])
+const emit = defineEmits(['emitChangeStep', 'emitLogin', 'emitReservation'])
+
+const nextButtonText = ref<string>('다음으로')
 const watchStep = ref(1)
+const buttonText = ref<string>('로그인')
 watch(propsItem, (newVal) => {
   watchStep.value = newVal.step
+  nextButtonText.value =
+    (propsItem.isLogin && newVal.step === 4) ||
+    (!propsItem.isLogin && newVal.step === 5)
+      ? '예약하기'
+      : '다음으로'
+  buttonText.value = newVal.step === 1 && !propsItem.isLogin ? '로그인' : '닫기'
 })
 
-const changeStep = (type: string) => {
+const changeStep = async (type: string) => {
   if (type === 'down') {
+    if (watchStep.value === 2 && !propsItem.isLogin) {
+      sessionStorage.removeItem('userInfo')
+    }
     emit('emitChangeStep', propsItem.step - 1 < 1 ? 1 : propsItem.step - 1)
+  } else if (
+    (propsItem.isLogin && watchStep.value === 4) ||
+    (!propsItem.isLogin && watchStep.value === 5)
+  ) {
+    await emit('emitReservation')
   } else {
     emit('emitChangeStep', propsItem.step + 1)
   }
 }
-
-const buttonText = ref<string>(
-  propsItem.step === 1 && !propsItem.isLogin ? '로그인' : '닫기'
-)
 
 const activeButton = () => {
   if (propsItem.step === 1 && !propsItem.isLogin) {

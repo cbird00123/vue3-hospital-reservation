@@ -54,15 +54,17 @@ const setDoctorList = (list: any[]) => {
 }
 
 const store = useStore()
-const interviewList = ref<any>([])
-const selectItem = ref()
+const interviewList = ref<any[]>([])
+const selectItem = ref<any>()
 const getInterview = async () => {
   const interviewResponse = await apis.interview(store.state.siteCode)
 
-  interviewList.value = interviewResponse.contents[0].interviewList
-  selectItem.value = interviewList.value[0]
+  if (interviewResponse?.resultCd === '200') {
+    interviewList.value = interviewResponse.contents[0].interviewList
+    selectItem.value = interviewList.value[0]
 
-  setDoctorList(interviewList.value)
+    setDoctorList(interviewList.value)
+  }
 }
 
 if ((isLogin && step === 2) || (!isLogin && step === 3)) {

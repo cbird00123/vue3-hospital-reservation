@@ -1,11 +1,11 @@
 <template>
-  <v-container fluid class="reservation-inquiry-container pa-1">
-    <ReservationInquiryStepper />
+  <v-container fluid class="reservation-modify-container pa-1">
+    <ReservationModifyStepper />
   </v-container>
 </template>
 
 <script setup lang="ts">
-import ReservationInquiryStepper from '../components/reservation/ReservationInquiryStepper.vue'
+import ReservationModifyStepper from '../components/reservation/ReservationModifyStepper.vue'
 import { useStore } from 'vuex'
 import { useRoute } from 'vue-router'
 
@@ -16,7 +16,7 @@ store.commit('setSiteCode', route.query.siteCode)
 </script>
 
 <style lang="scss" scoped>
-.reservation-inquiry-container {
+.reservation-modify-container {
   height: 100%;
   background: map-get($colors, secondary);
 }

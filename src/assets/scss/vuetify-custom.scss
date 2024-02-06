@@ -17,47 +17,48 @@
 .v-label {
   width: 100%;
 }
-
-.v-stepper-header {
-  padding: 0 10px;
-  @media screen and (max-width: 340px) {
-    padding: 0;
-  }
-  .v-stepper-item {
-    @media screen and (max-width: 1080px) {
-      padding: 1.5rem 0;
-      flex-basis: unset;
-      min-width: 55px;
-
-      .v-stepper-item__title {
-        font-size: 0.9rem;
-      }
-    }
-    @media screen and (max-width: 480px) {
-      padding: 1rem 0;
-      flex-basis: unset;
-      min-width: 50px;
-
-      .v-stepper-item__title {
-        font-size: 0.7rem;
-      }
-    }
+.v-divider{
+  display: none;
+}
+.reservation-container {
+  .v-stepper-header {
+    padding: 0 10px;
     @media screen and (max-width: 340px) {
-      padding: 1rem 0;
-      flex-basis: unset;
-      min-width: 50px;
+      padding: 0;
+    }
+    .v-stepper-item {
+      @media screen and (max-width: 1080px) {
+        padding: 1.5rem 0;
+        flex-basis: unset;
+        min-width: 55px;
 
-      .v-stepper-item__title {
-        font-size: 0.6rem;
+        .v-stepper-item__title {
+          font-size: 0.9rem;
+        }
+      }
+      @media screen and (max-width: 480px) {
+        padding: 1rem 0;
+        flex-basis: unset;
+        min-width: 50px;
+
+        .v-stepper-item__title {
+          font-size: 0.7rem;
+        }
+      }
+      @media screen and (max-width: 340px) {
+        padding: 1rem 0;
+        flex-basis: unset;
+        min-width: 50px;
+
+        .v-stepper-item__title {
+          font-size: 0.6rem;
+        }
+      }
+      .v-avatar {
+        width: 20px !important;
+        height: 20px !important;
       }
     }
-    .v-avatar {
-      width: 20px !important;
-      height: 20px !important;
-    }
-  }
-  .v-divider{
-    display: none;
   }
 }
 
@@ -68,5 +69,26 @@
   }
   &.secondary {
     background: map-get($map: $colors, $key: secondary);
+  }
+  &.border-primary {
+    border: 1px solid map-get($map: $colors, $key: primary);
+    color: map-get($map: $colors, $key: primary);
+  }
+  &.border-gray {
+    border: 1px solid #b9b9b9;
+    color: #b9b9b9;
+  }
+}
+
+.v-date-picker {
+  width: 100%;
+  margin: 0 auto;
+  @media screen and (min-width: 400px) {
+    padding: 0 16px;
+  }
+  .v-picker__body {
+    @media screen and (max-width: 400px) {
+      max-width: calc(100% - 20px);
+    }
   }
 }

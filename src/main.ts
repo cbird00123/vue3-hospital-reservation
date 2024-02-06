@@ -13,6 +13,9 @@ import App from './App.vue'
 import router from './router'
 import store from './store'
 
+import Dialog from './components/common/Dialog.vue'
+import Loading from './components/common/Loading.vue'
+
 const LightTheme: ThemeDefinition = {
   dark: false,
   variables: {},
@@ -54,5 +57,6 @@ const vuetify = createVuetify({
 
 const app = createApp(App)
 
+app.component('Dialog', Dialog).component('Loading', Loading)
 app.use(vuetify).use(dayjs).use(router).use(store)
 app.mount('#app')

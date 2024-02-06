@@ -29,9 +29,9 @@ const propsItem = defineProps({
   }
 })
 
-const step = ref(propsItem.step)
+const step = ref<number>(propsItem.step)
 
-const userInfo = ref(JSON.parse(sessionStorage.getItem('userInfo')))
+const userInfo = ref<any>(JSON.parse(sessionStorage.getItem('userInfo')))
 
 watch(step, (newVal) => {
   console.log(newVal)
