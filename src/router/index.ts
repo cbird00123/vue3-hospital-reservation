@@ -18,6 +18,11 @@ const router = createRouter({
       path: '/reservation-inquiry',
       name: 'reservation-inquiry',
       component: () => import('../views/ReservationInquiry.vue')
+    },
+    {
+      path: '/reservation-modify',
+      name: 'reservation-modify',
+      component: () => import('../views/ReservationModify.vue')
     }
     // {
     // path: '/about',

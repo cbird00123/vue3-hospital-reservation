@@ -35,8 +35,11 @@
 <script setup lang="ts">
 import { useStore } from 'vuex'
 import { ref } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 
 const store = useStore()
+const route = useRoute()
+const router = useRouter()
 const dialog = ref<boolean>(store.getters.getIsDialog)
 const dialogData = ref<any>(store.getters.getDialogData)
 
@@ -46,12 +49,26 @@ const closeModal = () => {
 }
 
 const active = () => {
+  if (dialogData.value.type !== 'goModify') {
+    dialogData.value.routeParams = {}
+  }
   switch (dialogData.value.type) {
     case 'normal':
       closeModal()
       break
     case 'call':
       document.location.href = `tel:${dialogData.value.telNum}`
+      closeModal()
+      break
+    case 'goModify':
+      router.push({
+        name: 'reservation-modify',
+        query: {
+          ...route.query,
+          type: dialogData.value.routeQuery
+        },
+        state: { reservationItem: { ...dialogData.value.routeParams } }
+      })
       closeModal()
       break
     default:
@@ -69,6 +86,7 @@ const active = () => {
     padding: 24px;
     border-radius: 15px;
     text-align: center;
+    font-size: 0.85rem;
   }
   &__btn {
     width: 100%;

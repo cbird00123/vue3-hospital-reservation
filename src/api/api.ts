@@ -171,6 +171,21 @@ const apis = {
     // })
     displayLoading('none')
     return response
+  },
+  history: async (patientType: string, params: any, siteCode: string) => {
+    displayLoading('block')
+    const querystring = convertingParamsToQuerystring(params)
+    await callFetch(
+      `/api/rpa/sites/${siteCode}/patients/appointment/schedule${patientType}${querystring}`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      }
+    )
+    displayLoading('none')
+    return response
   }
 }
 

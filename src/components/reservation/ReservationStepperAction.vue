@@ -33,10 +33,33 @@ const propsItem = defineProps({
   noneActionButton: {
     type: Boolean,
     default: false
+  },
+  type: {
+    type: String,
+    default: ''
   }
 })
 
-const emit = defineEmits(['emitChangeStep', 'emitLogin', 'emitReservation'])
+const emit = defineEmits([
+  'emitChangeStep',
+  'callEvent',
+  'emitReservation',
+  'emitHistory'
+])
+
+const eventCall = () => {
+  switch (propsItem.type) {
+    case 'reservationHistory':
+      emit('emitHistory')
+      break
+    default:
+      break
+  }
+}
+
+if (propsItem.isLogin) {
+  eventCall()
+}
 
 const nextButtonText = ref<string>('다음으로')
 const watchStep = ref(1)
@@ -49,6 +72,9 @@ watch(propsItem, (newVal) => {
       ? '예약하기'
       : '다음으로'
   buttonText.value = newVal.step === 1 && !propsItem.isLogin ? '로그인' : '닫기'
+  if (!newVal.isLogin && newVal.type && newVal.step === 2) {
+    eventCall()
+  }
 })
 
 const changeStep = async (type: string) => {
@@ -69,7 +95,7 @@ const changeStep = async (type: string) => {
 
 const activeButton = () => {
   if (propsItem.step === 1 && !propsItem.isLogin) {
-    emit('emitLogin')
+    emit('callEvent')
   }
 }
 </script>

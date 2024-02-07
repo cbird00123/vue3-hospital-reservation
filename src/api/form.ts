@@ -117,4 +117,19 @@ const formRule = (rule: ruleType, param?: any) => {
   return true
 }
 
-export { formInput, formRule }
+const formValidation = async (form: any) => {
+  const { valid } = await form.value.validate()
+
+  if (!valid) {
+    const errObj: any = document.querySelector('.v-input--error')
+    const scrollOpt = {
+      behavior: 'smooth',
+      block: 'center'
+    }
+    errObj.scrollIntoView(scrollOpt)
+  }
+
+  return valid
+}
+
+export { formInput, formRule, formValidation }

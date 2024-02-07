@@ -1,5 +1,9 @@
 <template>
   <v-container fluid class="step-interview-list">
+    <div class="step-interview-list__title">
+      <div>진료내용 선택</div>
+      <div>어떤 증상으로 예약을 원하시는지 선택해 주세요.</div>
+    </div>
     <v-radio-group v-model="selectItem" class="step-interview-list__box">
       <v-radio
         v-for="(item, index) in interviewList"
@@ -18,11 +22,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import {ref, watch} from 'vue'
 import { useStore } from 'vuex'
 import { apis } from '../../../api/api'
 
-const { step, isLogin } = defineProps({
+const propsItem = defineProps({
   step: {
     type: Number,
     default: 2
@@ -33,7 +37,7 @@ const { step, isLogin } = defineProps({
   }
 })
 
-const emit = defineEmits(['emitSetDoctor'])
+const emit = defineEmits(['emitSetDoctor', 'openDialog', 'backStep'])
 
 const setDoctorList = (list: any[]) => {
   const doctorList = list.reduce((sum, item, index) => {
@@ -64,16 +68,40 @@ const getInterview = async () => {
     selectItem.value = interviewList.value[0]
 
     setDoctorList(interviewList.value)
+  } else {
+    const dialogData = {
+      type: 'normal',
+      text: interviewResponse.resultMsg,
+      telNum: '',
+      positiveButton: '확인',
+      negativeButton: ''
+    }
+    emit('openDialog', dialogData)
+    emit('backStep')
   }
 }
 
-if ((isLogin && step === 2) || (!isLogin && step === 3)) {
+if (
+  (propsItem.isLogin && propsItem.step === 2) ||
+  (!propsItem.isLogin && propsItem.step === 3)
+) {
   getInterview()
 }
 </script>
 
 <style lang="scss" scoped>
 .step-interview-list {
+  &__title {
+    div {
+      &:first-child {
+        font-weight: 600;
+        font-size: 1.05rem;
+      }
+      &:last-child {
+        margin-bottom: 12px;
+      }
+    }
+  }
   &__box {
     &-item {
       &__text {

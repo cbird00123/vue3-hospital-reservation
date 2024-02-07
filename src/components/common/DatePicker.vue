@@ -1,5 +1,9 @@
 <template>
   <v-container fluid class="pa-0">
+    <div class="date-picker__title">
+      <div>예약 일자 선택</div>
+      <div>예약 일자를 선택해 주세요.</div>
+    </div>
     <v-date-picker
       v-model="date"
       :model-value="date"
@@ -7,16 +11,23 @@
     ></v-date-picker>
     <div class="time-box">
       <div class="time-title">시간 선택</div>
-      <div class="time-list">
-        <button
-          v-for="(item, index) in timeList"
-          :key="`timeButton${index}`"
-          :class="{ selected: item === time }"
-          @click="selectTime(item)"
-        >
-          {{ item }}
-        </button>
-      </div>
+      <template v-if="timeList?.length >= 1">
+        <div class="time-list">
+          <button
+            v-for="(item, index) in timeList"
+            :key="`timeButton${index}`"
+            :class="{ selected: item === time }"
+            @click="selectTime(item)"
+          >
+            {{ item }}
+          </button>
+        </div>
+      </template>
+      <template v-else>
+        <div style="text-align: center; padding: 12px 4px">
+          예약 가능한 시간이 없습니다. 다른 일자를 선택해주세요.
+        </div>
+      </template>
     </div>
   </v-container>
 </template>
@@ -24,6 +35,7 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
 import { useStore } from 'vuex'
+import { useRoute } from 'vue-router'
 import { apis } from '../../api/api'
 
 const propsItem = defineProps({
@@ -40,6 +52,8 @@ const propsItem = defineProps({
     default: () => {}
   }
 })
+
+const route = useRoute()
 
 const store = useStore()
 
@@ -125,13 +139,26 @@ watch(date, (newVal) => {
 
 if (
   (propsItem.isLogin && propsItem.step === 4) ||
-  (!propsItem.isLogin && propsItem.step === 5)
+  (!propsItem.isLogin && propsItem.step === 5) ||
+  route.query.type === 'change'
 ) {
   getDate()
 }
 </script>
 
 <style lang="scss" scoped>
+.date-picker__title {
+  padding: 12px 12px 0;
+  div {
+    &:first-child {
+      font-weight: 600;
+      font-size: 1.05rem;
+    }
+    &:last-child {
+      margin-bottom: 12px;
+    }
+  }
+}
 .time-box {
   padding: 0 16px;
 }

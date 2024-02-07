@@ -21,11 +21,7 @@
         :model-value="params.telNum"
         maxlength="13"
         :rules="[formRule('require'), formRule('phone')]"
-        @input="
-          () => {
-            params.telNum = formInput('phone', params.telNum)
-          }
-        "
+        @input="params.telNum = formInput('phone', params.telNum)"
       ></v-text-field>
       <v-text-field
         v-model="params.birth"
@@ -34,11 +30,7 @@
         :model-value="params.birth"
         maxlength="10"
         :rules="[formRule('require'), formRule('birth')]"
-        @input="
-          () => {
-            params.birth = formInput('birth', params.birth)
-          }
-        "
+        @input="params.birth = formInput('birth', params.birth)"
         @keyup="(e) => login(e)"
       ></v-text-field>
     </v-form>
@@ -47,9 +39,18 @@
 
 <script setup lang="ts">
 import { ref, watch } from 'vue'
-import { formInput, formRule } from '../../api/form'
+import { formInput, formRule, formValidation } from '../../api/form'
 
-const emit = defineEmits(['emitLogin', 'emitChangeParams'])
+const loginForm = ref()
+
+const propsItem = defineProps({
+  callEvent: {
+    type: Boolean,
+    default: false
+  }
+})
+
+const emit = defineEmits(['emitLogin', 'emitChangeParams', 'openDialog'])
 
 const userInfo = JSON.parse(sessionStorage.getItem('userInfo')) || ref({})
 
@@ -66,11 +67,33 @@ watch(
   },
   { deep: true }
 )
-const login = (event: any) => {
+
+const validate = () => {
+  return formValidation(loginForm)
+}
+
+const login = async (event: any) => {
   if (event.code === 'Enter' || event.code === 'NumpadEnter') {
-    emit('emitLogin')
+    if (await validate()) {
+      emit('emitLogin')
+    } else {
+      const dialogData = {
+        type: 'normal',
+        text: '서비스 사용을 위해 필요한 정보를<br/> 입력해주세요.',
+        telNum: '',
+        positiveButton: '확인',
+        negativeButton: ''
+      }
+      emit('openDialog', dialogData)
+    }
   }
 }
+
+watch(propsItem, (newVal) => {
+  if (newVal.callEvent) {
+    login({ code: 'Enter' })
+  }
+})
 </script>
 
 <style lang="scss" scoped>

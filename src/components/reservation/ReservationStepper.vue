@@ -17,10 +17,13 @@
         :key="item.refName + index"
         :ref="item.refName"
         :step="step"
+        :call-event="eventValid"
         :is-login="isLogin"
         :doctor-list="doctorList"
         :selected-doctor="selectedDoctor"
         :reservation-complete-data="reservationCompleteData"
+        @openDialog="openDialog"
+        @backStep="step--"
         @emitLogin="login"
         @emitChangeParams="(v) => (loginParams = v)"
         @emitSetDoctor="(v) => (doctorList = v)"
@@ -33,7 +36,7 @@
       :is-login="isLogin"
       :none-action-button="noneActionButton"
       @emitChangeStep="(s) => (step = s)"
-      @emitLogin="login"
+      @callEvent="callEvent"
       @emitReservation="reservation"
     />
     <Dialog :key="dialogKey" />
@@ -41,7 +44,7 @@
 </template>
 
 <script setup lang="ts">
-import { defineAsyncComponent, ref, shallowRef } from 'vue'
+import { defineAsyncComponent, ref, shallowRef, watch } from 'vue'
 import { useStore } from 'vuex'
 import ReservationStepperAction from './ReservationStepperAction.vue'
 import { apis } from '../../api/api'
@@ -92,14 +95,8 @@ const stepComponent = shallowRef([
 
 const store = useStore()
 const dialogKey = ref<number>(0)
-const openDialog = () => {
-  store.commit('setDialogData', {
-    type: 'normal',
-    text: '1111111<br/> 121212<br/> 12312',
-    telNum: '',
-    positiveButton: '확인',
-    negativeButton: ''
-  })
+const openDialog = (dialogData: any) => {
+  store.commit('setDialogData', dialogData)
   store.commit('setDialog', true)
   dialogKey.value += 1
 }
@@ -111,6 +108,12 @@ if (isLogin.value) {
   stepTitle.shift()
   stepComponent.value.shift()
   noneActionButton.value = false
+}
+
+const eventValid = ref(false)
+
+const callEvent = () => {
+  eventValid.value = true
 }
 
 const loginParams = ref({
@@ -146,6 +149,17 @@ const convertingDateTimeText = (reservationDate: string | undefined) => {
   return `20${rYear}년 ${rMonth}월 ${rDate}일 ${rHour}시 ${rMinute}분`
 }
 const reservation = async () => {
+  if (!dateTime.value) {
+    const dialogData = {
+      type: 'normal',
+      text: '예약 시간을 선택해주세요.',
+      telNum: '',
+      positiveButton: '확인',
+      negativeButton: ''
+    }
+    openDialog(dialogData)
+    return
+  }
   const tempDate = dateTime.value?.replace(/[^0-9]/g, '').substring(2)
   const resultDate = convertingDateTimeText(tempDate)
   reservationParams.value = {

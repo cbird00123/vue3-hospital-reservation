@@ -18,6 +18,8 @@
         :ref="item.refName"
         :step="step"
         :is-login="isLogin"
+        :reservation-history-info-list="reservationHistoryInfoList"
+        @openDialog="openDialog"
         @emitLogin="login"
         @emitChangeParams="(v) => (loginParams = v)"
       ></component>
@@ -25,8 +27,11 @@
     <ReservationStepperAction
       :step="step"
       :is-login="isLogin"
+      :none-action-button="noneActionButton"
+      :type="'reservationHistory'"
       @emitChangeStep="(s) => (step = s)"
-      @emitLogin="login"
+      @callEvent="login"
+      @emitHistory="reservationHistory"
     />
     <Dialog :key="dialogKey" />
   </v-stepper>
@@ -62,17 +67,12 @@ const stepComponent = shallowRef([
 
 const store = useStore()
 const dialogKey = ref<number>(0)
-const openDialog = () => {
-  store.commit('setDialogData', {
-    type: 'normal',
-    text: '1111111<br/> 121212<br/> 12312',
-    telNum: '',
-    positiveButton: '확인',
-    negativeButton: ''
-  })
+const openDialog = (dialogData: any) => {
+  store.commit('setDialogData', dialogData)
   store.commit('setDialog', true)
   dialogKey.value += 1
 }
+
 const noneActionButton = ref<boolean>(true)
 const isLogin = ref<boolean>(false)
 const userInfo = ref<any>(JSON.parse(sessionStorage.getItem('userInfo')))
@@ -92,8 +92,28 @@ const loginParams = ref({
 const login = async () => {
   await apis.login(loginParams.value, store.state.siteCode)
   userInfo.value = JSON.parse(sessionStorage.getItem('userInfo'))
-  noneActionButton.value = true
+  noneActionButton.value = false
   step.value++
+}
+
+const reservationHistoryInfoList = ref<any[]>()
+
+const reservationHistory = async () => {
+  const patientType = userInfo?.value?.patientNo ? '' : '/new'
+  const historyParams = {
+    patientNm: userInfo?.value?.patientNm,
+    telNum: userInfo?.value?.telNum
+  }
+  const reservationPatientHistoryResponse = await apis.history(
+    patientType,
+    historyParams,
+    store.state.siteCode
+  )
+
+  if (reservationPatientHistoryResponse.resultCd === '200') {
+    reservationHistoryInfoList.value =
+      reservationPatientHistoryResponse.contents
+  }
 }
 </script>
 

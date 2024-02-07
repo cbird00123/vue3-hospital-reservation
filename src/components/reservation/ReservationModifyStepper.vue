@@ -10,30 +10,19 @@
       <component
         :is="item.component"
         v-for="(item, index) in stepComponent"
-        v-show="
-          (!isLogin && step === item.step) ||
-          (isLogin && step === item.step - 1)
-        "
+        v-show="step === item.step"
         :key="item.refName + index"
         :ref="item.refName"
         :step="step"
-        :is-login="isLogin"
-        :doctor-list="doctorList"
         :selected-doctor="selectedDoctor"
         :reservation-complete-data="reservationCompleteData"
-        @emitLogin="login"
-        @emitChangeParams="(v) => (loginParams = v)"
-        @emitSetDoctor="(v) => (doctorList = v)"
-        @emitSelectedDoctor="(v) => (selectedDoctor = v)"
         @emitSeletedDateTime="(v) => (dateTime = v)"
       ></component>
     </template>
     <ReservationStepperAction
       :step="step"
-      :is-login="isLogin"
       :none-action-button="noneActionButton"
       @emitChangeStep="(s) => (step = s)"
-      @emitLogin="login"
       @emitReservation="reservation"
     />
     <Dialog :key="dialogKey" />
@@ -47,14 +36,7 @@ import ReservationStepperAction from './ReservationStepperAction.vue'
 import { apis } from '../../api/api'
 
 const step = ref(1)
-const stepTitle = <string[]>[
-  '로그인',
-  '정보확인',
-  '문진',
-  '의사선택',
-  '날짜선택',
-  '예약완료'
-]
+const stepTitle = <string[]>['날짜선택', '취소사유', '예약완료']
 const stepComponent = shallowRef([
   {
     step: 1,
@@ -63,10 +45,8 @@ const stepComponent = shallowRef([
   },
   {
     step: 1,
-    refName: 'cancelRevokePage',
-    component: defineAsyncComponent(
-      () => import('./step/StepCancelRevokePage.vue')
-    )
+    refName: 'cancelPage',
+    component: defineAsyncComponent(() => import('./step/StepCancelPage.vue'))
   },
   {
     step: 2,
@@ -77,19 +57,21 @@ const stepComponent = shallowRef([
 
 const store = useStore()
 const dialogKey = ref<number>(0)
-const openDialog = () => {
-  store.commit('setDialogData', {
-    type: 'normal',
-    text: '1111111<br/> 121212<br/> 12312',
-    telNum: '',
-    positiveButton: '확인',
-    negativeButton: ''
-  })
+const { reservationItem } = history.state
+const openDialog = (dialogData: any) => {
+  store.commit('setDialogData', dialogData)
   store.commit('setDialog', true)
   dialogKey.value += 1
 }
+
 const noneActionButton = ref<boolean>(false)
 const userInfo = ref<any>(JSON.parse(sessionStorage.getItem('userInfo')))
+
+const selectedDoctor = ref<any>({
+  deptNo: reservationItem.deptNo,
+  doctorNm: reservationItem.doctorNm,
+  doctorNo: reservationItem.doctorNo
+})
 
 const dateTime = ref<string>()
 
@@ -106,7 +88,7 @@ const convertingDateTimeText = (reservationDate: string | undefined) => {
 
   return `20${rYear}년 ${rMonth}월 ${rDate}일 ${rHour}시 ${rMinute}분`
 }
-const reservation = async () => {
+const reservation = async (type: string | undefined) => {
   const tempDate = dateTime.value?.replace(/[^0-9]/g, '').substring(2)
   const resultDate = convertingDateTimeText(tempDate)
   reservationParams.value = {

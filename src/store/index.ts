@@ -5,6 +5,8 @@ interface IDialogData {
   telNum: string
   positiveButton: string
   negativeButton: string
+  routeQuery?: string
+  routeParams?: any
 }
 
 export default createStore({
