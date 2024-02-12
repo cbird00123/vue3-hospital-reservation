@@ -20,6 +20,7 @@
 
 <script setup lang="ts">
 import { ref, watch } from 'vue'
+import { useRoute } from 'vue-router'
 
 const propsItem = defineProps({
   step: {
@@ -61,7 +62,19 @@ if (propsItem.isLogin) {
   eventCall()
 }
 
+const route = useRoute()
+
 const nextButtonText = ref<string>('다음으로')
+
+switch (route.query.type) {
+  case 'change':
+    nextButtonText.value = '예약변경'
+    break
+  case 'cancel':
+    nextButtonText.value = '예약취소'
+    break
+}
+
 const watchStep = ref(1)
 const buttonText = ref<string>('로그인')
 watch(propsItem, (newVal) => {
@@ -85,9 +98,18 @@ const changeStep = async (type: string) => {
     emit('emitChangeStep', propsItem.step - 1 < 1 ? 1 : propsItem.step - 1)
   } else if (
     (propsItem.isLogin && watchStep.value === 4) ||
-    (!propsItem.isLogin && watchStep.value === 5)
+    (!propsItem.isLogin && watchStep.value === 5) ||
+    route.query.type
   ) {
-    await emit('emitReservation')
+    if (route.query.type) {
+      if (route.query.type === 'change') {
+        await emit('emitReservation', 'change')
+      } else {
+        await emit('emitReservation', 'cancel')
+      }
+    } else {
+      await emit('emitReservation')
+    }
   } else {
     emit('emitChangeStep', propsItem.step + 1)
   }

@@ -17,6 +17,7 @@
         :key="item.refName + index"
         :ref="item.refName"
         :step="step"
+        :call-event="eventValid"
         :is-login="isLogin"
         :reservation-history-info-list="reservationHistoryInfoList"
         @openDialog="openDialog"
@@ -30,7 +31,7 @@
       :none-action-button="noneActionButton"
       :type="'reservationHistory'"
       @emitChangeStep="(s) => (step = s)"
-      @callEvent="login"
+      @callEvent="callEvent"
       @emitHistory="reservationHistory"
     />
     <Dialog :key="dialogKey" />
@@ -81,6 +82,12 @@ if (isLogin.value) {
   stepTitle.shift()
   stepComponent.value.shift()
   noneActionButton.value = false
+}
+
+const eventValid = ref(false)
+
+const callEvent = () => {
+  eventValid.value = true
 }
 
 const loginParams = ref({

@@ -171,7 +171,7 @@ const reservation = async () => {
     doctorNm: selectedDoctor.value.doctorNm,
     patientNo: null,
     patientSeq: null,
-    patientType: '신환',
+    patientType: userInfo.value.patientNo ? '재진' : '신환',
     reservationComment: '진료예약진행',
     reservationKey: null,
     appointmentType: 'NORMAL',

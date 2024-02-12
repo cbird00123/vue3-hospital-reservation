@@ -129,46 +129,25 @@ const apis = {
   },
   changeReservation: async (params: any, siteCode: string) => {
     displayLoading('block')
-    // await callFetch(`/api/rpa/sites/${siteCode}/medical/appointment`, {
-    //   method: 'PUT',
-    //   headers: {
-    //     'Content-Type': 'application/json'
-    //   },
-    //   body: JSON.stringify(params)
-    // })
+    await callFetch(`/api/rpa/sites/${siteCode}/medical/appointment`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(params)
+    })
     displayLoading('none')
     return response
   },
   cancelReservation: async (params: any, siteCode: string) => {
     displayLoading('block')
-    // const cancelData = {
-    //   siteId: this.$store.getters.getSiteCode,
-    //   appointmentDate: this.reservationData.staff.appointmentDate,
-    //   reservationKey: this.reservationData.staff.reservationKey,
-    //   deptNm: this.reservationData.staff.deptNm,
-    //   deptNo: this.reservationData.staff.deptNo,
-    //   doctorNm: this.reservationData.staff.doctorNm,
-    //   patientNo:
-    //     this.reservationData.patientNoString === '0'
-    //       ? null
-    //       : this.reservationData.patientNoString,
-    //   patientType: this.getPatientType(),
-    //   cancelComment: this.cancelReasonTypeCode,
-    //   patientNm: this.userInfo?.userNm || this.ssnInfo?.name,
-    //   birth:
-    //     this.userInfo?.birth?.replaceAll('-', '') ||
-    //     this.ssnInfo?.birth?.replaceAll('-', ''),
-    //   telNum: this.userInfo?.cellphoneNum || this.ssnInfo?.telNum,
-    //   ssn: this.ssnInfo?.ssn,
-    //   hospitalBranch: this.branchData.name,
-    // }
-    // await callFetch(`/api/rpa/sites/${siteCode}/medical/appointment`, {
-    //   method: 'DELETE',
-    //   headers: {
-    //     'Content-Type': 'application/json'
-    //   },
-    //   body: JSON.stringify(params)
-    // })
+    await callFetch(`/api/rpa/sites/${siteCode}/medical/appointment`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(params)
+    })
     displayLoading('none')
     return response
   },
