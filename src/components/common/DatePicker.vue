@@ -6,12 +6,11 @@
     </div>
     <v-date-picker
       v-model="date"
-      :model-value="date"
       :allowed-dates="dateList"
     ></v-date-picker>
     <div class="time-box">
       <div class="time-title">시간 선택</div>
-      <template v-if="timeList?.length >= 1">
+      <template v-if="timeList && timeList?.length >= 1">
         <div class="time-list">
           <button
             v-for="(item, index) in timeList"
@@ -63,10 +62,11 @@ const date = ref()
 const timeList = ref<any[]>()
 const time = ref<string>()
 
-const emit = defineEmits(['emitSeletedDateTime'])
+const emit = defineEmits(['emitSelectedDateTime'])
 const selectTime = (item: string) => {
   time.value = item
-  emit('emitSeletedDateTime', selectDate.value + time.value)
+  const result: string = selectDate.value + time.value
+  emit('emitSelectedDateTime', result)
 }
 
 const convertingTime = (item: string) => {
@@ -140,7 +140,7 @@ watch(date, (newVal) => {
 if (
   (propsItem.isLogin && propsItem.step === 4) ||
   (!propsItem.isLogin && propsItem.step === 5) ||
-  route.query.type === 'change'
+  (route.query.type === 'change' && propsItem.step === 1)
 ) {
   getDate()
 }

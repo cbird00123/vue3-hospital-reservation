@@ -40,8 +40,8 @@ const PropsItem = defineProps({
   }
 })
 
-const itemList = ref(PropsItem.doctorList)
-const selectDoctor = ref(itemList.value[0])
+const itemList = ref<any>(PropsItem.doctorList)
+const selectDoctor = ref<any>(itemList.value[0])
 const emit = defineEmits(['emitSelectedDoctor'])
 emit('emitSelectedDoctor', selectDoctor.value)
 watch(selectDoctor, (newVal) => {

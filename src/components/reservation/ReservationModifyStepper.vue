@@ -16,7 +16,7 @@
         :step="step"
         :selected-doctor="selectedDoctor"
         :reservation-complete-data="reservationCompleteData"
-        @emitSeletedDateTime="(v) => (dateTime = v)"
+        @emitSelectedDateTime="(v) => (dateTime = v)"
         @emitSetCancelCode="(v) => (cancelCode = v)"
       ></component>
     </template>
@@ -72,15 +72,19 @@ switch (route.query.type) {
 const store = useStore()
 const dialogKey = ref<number>(0)
 const { reservationItem } = history.state
-console.log(reservationItem)
 const openDialog = (dialogData: any) => {
+  dialogData.telNum = store.state.aiHomeData?.site?.telNum
   store.commit('setDialogData', dialogData)
   store.commit('setDialog', true)
   dialogKey.value += 1
 }
 
 const noneActionButton = ref<boolean>(false)
-const userInfo = ref<any>(JSON.parse(sessionStorage.getItem('userInfo')))
+const userInfo = ref<any>()
+if (sessionStorage.getItem('userInfo')) {
+  const item: string = sessionStorage.getItem('userInfo') || ''
+  userInfo.value = JSON.parse(item)
+}
 
 const selectedDoctor = ref<any>({
   deptNo: reservationItem.deptNo,
@@ -88,13 +92,13 @@ const selectedDoctor = ref<any>({
   doctorNo: reservationItem.doctorNo
 })
 
-const dateTime = ref<string>()
+const dateTime = ref<any>('')
 
 const reservationParams = ref<any>({})
 
 const reservationCompleteData = ref<any>({})
 
-const cancelCode = ref<string>('')
+const cancelCode = ref<any>('')
 
 const convertingDateTimeText = (reservationDate: string | undefined) => {
   const rYear = reservationDate?.substring(0, 2)
@@ -106,15 +110,26 @@ const convertingDateTimeText = (reservationDate: string | undefined) => {
   return `20${rYear}년 ${rMonth}월 ${rDate}일 ${rHour}시 ${rMinute}분`
 }
 const reservation = async (type: string | undefined) => {
-  console.log(type)
+  if (!dateTime.value && type === 'change') {
+    const dialogData = {
+      type: 'normal',
+      text: '예약 시간을 선택해주세요.',
+      positiveButton: '확인',
+      negativeButton: ''
+    }
+    openDialog(dialogData)
+    return
+  }
   const tempDate = dateTime.value?.replace(/[^0-9]/g, '').substring(2)
-  const resultDate = convertingDateTimeText(tempDate)
+  const tempBeforeAppointDate = reservationItem.appointmentDate
+    .replace(/[^0-9]/g, '')
+    .substring(2, 12)
+  const resultDate = tempDate
+    ? convertingDateTimeText(tempDate)
+    : convertingDateTimeText(tempBeforeAppointDate)
   if (type === 'change') {
-    const tempBeforeAppointDate = reservationItem.appointmentDate
     reservationParams.value = {
-      beforeAppointHours: tempBeforeAppointDate
-        .replace(/[^0-9]/g, '')
-        .substring(2, 12),
+      beforeAppointHours: tempBeforeAppointDate,
       afterAppointHours: tempDate,
       appointmentDate: tempDate,
       deptNo: selectedDoctor.value.deptNo,
@@ -134,7 +149,7 @@ const reservation = async (type: string | undefined) => {
   } else {
     reservationParams.value = {
       siteId: store.state.siteCode,
-      appointmentDate: reservationItem.appointmentDate,
+      appointmentDate: tempBeforeAppointDate,
       reservationKey: reservationItem.reservationKey,
       deptNo: selectedDoctor.value.deptNo,
       deptNm: selectedDoctor.value.deptNm,
@@ -144,7 +159,7 @@ const reservation = async (type: string | undefined) => {
       patientType: userInfo.value.patientNo ? '재진' : '신환',
       cancelComment: cancelCode,
       patientNm: userInfo.value.patientNm,
-      birth: userInfo.value.birth,
+      birth: userInfo.value.birth.replace(/-/g, ''),
       telNum: userInfo.value.telNum
     }
   }
@@ -168,10 +183,10 @@ const reservation = async (type: string | undefined) => {
     reservationResponse.value.contents.resultCd === 'success' ||
     reservationResponse.value.contents.responseCode === 'SUCCESS'
   ) {
-    resultText.value = `예약${type === 'change' ? '변경' : '취소'}이 완료되었습니다.`
+    resultText.value = `예약${type === 'change' ? '변경이' : '취소가'} 완료되었습니다.`
     noneActionButton.value = true
   } else {
-    resultText.value = `예약${type === 'change' ? '변경' : '취소'}이 실패되었습니다.`
+    resultText.value = `예약${type === 'change' ? '변경이' : '취소가'} 실패되었습니다.`
     noneActionButton.value = false
   }
   console.log(reservationResponse.value)

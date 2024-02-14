@@ -13,7 +13,8 @@ export default createStore({
   state: {
     siteCode: '',
     isDialog: false,
-    dialogData: <IDialogData>{}
+    dialogData: <IDialogData>{},
+    aiHomeData: {}
   },
   getters: {
     getIsDialog: (state) => {
@@ -32,6 +33,9 @@ export default createStore({
     },
     setDialogData(state, value) {
       state.dialogData = value
+    },
+    setAiHomeData(state, value) {
+      state.aiHomeData = value
     }
   }
 })

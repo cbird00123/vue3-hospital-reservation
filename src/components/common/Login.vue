@@ -6,7 +6,6 @@
         variant="outlined"
         label="성명"
         maxlength="6"
-        :model-value="params.patientNm"
         :rules="[
           formRule('require'),
           formRule('notSpecialCharacter'),
@@ -18,7 +17,6 @@
         v-model="params.telNum"
         variant="outlined"
         label="전화번호"
-        :model-value="params.telNum"
         maxlength="13"
         :rules="[formRule('require'), formRule('phone')]"
         @input="params.telNum = formInput('phone', params.telNum)"
@@ -27,11 +25,10 @@
         v-model="params.birth"
         variant="outlined"
         label="생년월일"
-        :model-value="params.birth"
         maxlength="10"
         :rules="[formRule('require'), formRule('birth')]"
         @input="params.birth = formInput('birth', params.birth)"
-        @keyup="(e) => login(e)"
+        @keyup="(e: any) => login(e)"
       ></v-text-field>
     </v-form>
   </v-container>
@@ -52,13 +49,21 @@ const propsItem = defineProps({
 
 const emit = defineEmits(['emitLogin', 'emitChangeParams', 'openDialog'])
 
-const userInfo = JSON.parse(sessionStorage.getItem('userInfo')) || ref({})
-
-const params = ref({
-  patientNm: userInfo?.patientNm || '',
-  telNum: userInfo?.telNum || '',
-  birth: userInfo?.birth || ''
+const userInfo = ref<any>()
+const params = ref<any>({
+  patientNm: '',
+  telNum: '',
+  birth: ''
 })
+if (sessionStorage.getItem('userInfo')) {
+  const item: string = sessionStorage.getItem('userInfo') || ''
+  userInfo.value = JSON.parse(item)
+  params.value = {
+    patientNm: userInfo?.value.patientNm || '',
+    telNum: userInfo?.value.telNum || '',
+    birth: userInfo?.value.birth || ''
+  }
+}
 
 watch(
   params,
@@ -80,7 +85,6 @@ const login = async (event: any) => {
       const dialogData = {
         type: 'normal',
         text: '서비스 사용을 위해 필요한 정보를<br/> 입력해주세요.',
-        telNum: '',
         positiveButton: '확인',
         negativeButton: ''
       }

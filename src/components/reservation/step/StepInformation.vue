@@ -20,7 +20,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref } from 'vue'
 
 const propsItem = defineProps({
   step: {
@@ -31,11 +31,11 @@ const propsItem = defineProps({
 
 const step = ref<number>(propsItem.step)
 
-const userInfo = ref<any>(JSON.parse(sessionStorage.getItem('userInfo')))
-
-watch(step, (newVal) => {
-  console.log(newVal)
-})
+const userInfo = ref<any>()
+if (sessionStorage.getItem('userInfo')) {
+  const item: string = sessionStorage.getItem('userInfo') || ''
+  userInfo.value = JSON.parse(item)
+}
 </script>
 
 <style lang="scss" scoped>

@@ -72,7 +72,6 @@ const getInterview = async () => {
     const dialogData = {
       type: 'normal',
       text: interviewResponse.resultMsg,
-      telNum: '',
       positiveButton: '확인',
       negativeButton: ''
     }

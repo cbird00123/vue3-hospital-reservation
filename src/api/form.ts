@@ -56,6 +56,7 @@ const formInput = (type: inputType, param?: any) => {
       v = v.replace(/[^0-9]/g, '')
 
       const result = v.match(/(\d{0,4})(\d{0,2})(\d{0,2})/)
+      // @ts-ignore
       const [, year, month, date]: RegExpMatchArray = result
       return !month ? year : `${year}-${month}${date ? `-${date}` : ''}`
     }

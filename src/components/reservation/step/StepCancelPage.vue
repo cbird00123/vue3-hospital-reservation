@@ -23,7 +23,6 @@
       v-model="etcText"
       variant="outlined"
       label="사유"
-      :model-value="etcText"
     ></v-text-field>
   </v-container>
 </template>

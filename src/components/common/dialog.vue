@@ -61,7 +61,7 @@ const active = () => {
       closeModal()
       break
     case 'goModify':
-      router.push({
+      router.replace({
         name: 'reservation-modify',
         query: {
           ...route.query,

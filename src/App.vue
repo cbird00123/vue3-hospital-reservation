@@ -1,7 +1,10 @@
 <template>
   <div id="app">
-    <RouterView />
+    <suspense>
+      <RouterView />
+    </suspense>
     <Loading />
+    <RpaLoading />
   </div>
 </template>
 

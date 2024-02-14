@@ -28,7 +28,7 @@
         @emitChangeParams="(v) => (loginParams = v)"
         @emitSetDoctor="(v) => (doctorList = v)"
         @emitSelectedDoctor="(v) => (selectedDoctor = v)"
-        @emitSeletedDateTime="(v) => (dateTime = v)"
+        @emitSelectedDateTime="(v) => (dateTime = v)"
       ></component>
     </template>
     <ReservationStepperAction
@@ -96,27 +96,32 @@ const stepComponent = shallowRef([
 const store = useStore()
 const dialogKey = ref<number>(0)
 const openDialog = (dialogData: any) => {
+  dialogData.telNum = store.state.aiHomeData?.site?.telNum
   store.commit('setDialogData', dialogData)
   store.commit('setDialog', true)
   dialogKey.value += 1
 }
 const noneActionButton = ref<boolean>(true)
 const isLogin = ref<boolean>(false)
-const userInfo = ref<any>(JSON.parse(sessionStorage.getItem('userInfo')))
-if (sessionStorage.getItem('userInfo')) isLogin.value = true
+const userInfo = ref<any>()
+if (sessionStorage.getItem('userInfo')) {
+  const item: string = sessionStorage.getItem('userInfo') || ''
+  userInfo.value = JSON.parse(item)
+  isLogin.value = true
+}
 if (isLogin.value) {
   stepTitle.shift()
   stepComponent.value.shift()
   noneActionButton.value = false
 }
 
-const eventValid = ref(false)
+const eventValid = ref<boolean>(false)
 
 const callEvent = () => {
   eventValid.value = true
 }
 
-const loginParams = ref({
+const loginParams = ref<any>({
   patientNm: '',
   telNum: '',
   birth: ''
@@ -124,16 +129,19 @@ const loginParams = ref({
 
 const login = async () => {
   await apis.login(loginParams.value, store.state.siteCode)
-  userInfo.value = JSON.parse(sessionStorage.getItem('userInfo'))
+  if (sessionStorage.getItem('userInfo')) {
+    const item: string = sessionStorage.getItem('userInfo') || ''
+    userInfo.value = JSON.parse(item)
+  }
   noneActionButton.value = false
   step.value++
 }
 
-const doctorList = ref<any[]>([])
+const doctorList = ref<any>([])
 
 const selectedDoctor = ref<any>({})
 
-const dateTime = ref<string>()
+const dateTime = ref<any>()
 
 const reservationParams = ref<any>({})
 
@@ -149,18 +157,17 @@ const convertingDateTimeText = (reservationDate: string | undefined) => {
   return `20${rYear}년 ${rMonth}월 ${rDate}일 ${rHour}시 ${rMinute}분`
 }
 const reservation = async () => {
-  if (!dateTime.value) {
+  if (!dateTime?.value) {
     const dialogData = {
       type: 'normal',
       text: '예약 시간을 선택해주세요.',
-      telNum: '',
       positiveButton: '확인',
       negativeButton: ''
     }
     openDialog(dialogData)
     return
   }
-  const tempDate = dateTime.value?.replace(/[^0-9]/g, '').substring(2)
+  const tempDate = dateTime?.value?.replace(/[^0-9]/g, '').substring(2)
   const resultDate = convertingDateTimeText(tempDate)
   reservationParams.value = {
     afterAppointHours: tempDate,
@@ -186,7 +193,10 @@ const reservation = async () => {
   )
 
   const resultText = ref<string>('')
-  if (reservationResponse.contents.resultCd === 'success') {
+  if (
+    reservationResponse.contents.resultCd === 'success' ||
+    reservationResponse.contents.responseCode === 'SUCCESS'
+  ) {
     resultText.value = '예약이 완료되었습니다.'
     noneActionButton.value = true
   } else {

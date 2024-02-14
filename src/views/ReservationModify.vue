@@ -6,13 +6,6 @@
 
 <script setup lang="ts">
 import ReservationModifyStepper from '../components/reservation/ReservationModifyStepper.vue'
-import { useStore } from 'vuex'
-import { useRoute } from 'vue-router'
-
-const store = useStore()
-const route = useRoute()
-
-store.commit('setSiteCode', route.query.siteCode)
 </script>
 
 <style lang="scss" scoped>

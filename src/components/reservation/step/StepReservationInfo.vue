@@ -1,5 +1,8 @@
 <template>
   <v-container fluid class="pa-0">
+    <div v-show="historyList.length === 0" class="none-info">
+      예약된 일정이 없습니다.
+    </div>
     <div v-for="(item, index) in historyList" :key="`historyInfo${index}`">
       <div class="info-head">
         <div>예약</div>
@@ -39,6 +42,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import { useStore } from 'vuex'
 
 const propsItem = defineProps({
   reservationHistoryInfoList: {
@@ -56,6 +60,8 @@ historyList.value.forEach((item) => {
   item.historyFullDateTime = `${tempDate[0]}년 ${tempDate[1]}월 ${tempDate[2]}일 ${tempTime[0]}시 ${tempTime[1]}분`
 })
 
+const store = useStore()
+
 const emit = defineEmits(['openDialog'])
 const modify = (type: string, reservationItem: any) => {
   const workTypeCd = reservationItem.workTypeCode
@@ -63,8 +69,7 @@ const modify = (type: string, reservationItem: any) => {
   if (workTypeCd && workTypeCd !== 'WORK_TYPE_CODE_00') {
     dialogData = {
       type: 'call',
-      text: '해당 예약건은 고객센터()으로 문의 바랍니다.',
-      telNum: '',
+      text: `해당 예약건은 고객센터(${store.state.aiHomeData.site.telNum || ''})으로 문의 바랍니다.`,
       positiveButton: '통화',
       negativeButton: '닫기'
     }
@@ -83,7 +88,6 @@ const modify = (type: string, reservationItem: any) => {
       dialogData = {
         type: 'goModify',
         text: '예약 변경을 진행 하시겠습니까?',
-        telNum: '',
         positiveButton: '확인',
         negativeButton: '취소',
         routeQuery: type,
@@ -99,11 +103,10 @@ const modify = (type: string, reservationItem: any) => {
       dialogData = {
         type: 'goModify',
         text: '예약 취소를 진행 하시겠습니까?',
-        telNum: '',
         positiveButton: '확인',
         negativeButton: '취소',
         routeQuery: type,
-        routeData: reservationItem
+        routeParams: reservationItem
       }
       emit('openDialog', dialogData)
       break
@@ -114,6 +117,9 @@ const modify = (type: string, reservationItem: any) => {
 </script>
 
 <style lang="scss" scoped>
+.none-info {
+  text-align: center;
+}
 .info-head {
   display: flex;
   align-items: center;

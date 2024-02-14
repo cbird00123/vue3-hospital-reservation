@@ -79,6 +79,9 @@
     color: #b9b9b9;
   }
 }
+.f-primary {
+  color: map-get($map: $colors, $key: primary);
+}
 
 .v-date-picker {
   width: 100%;

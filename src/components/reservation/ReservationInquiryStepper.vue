@@ -69,6 +69,7 @@ const stepComponent = shallowRef([
 const store = useStore()
 const dialogKey = ref<number>(0)
 const openDialog = (dialogData: any) => {
+  dialogData.telNum = store.state.aiHomeData?.site?.telNum
   store.commit('setDialogData', dialogData)
   store.commit('setDialog', true)
   dialogKey.value += 1
@@ -76,21 +77,25 @@ const openDialog = (dialogData: any) => {
 
 const noneActionButton = ref<boolean>(true)
 const isLogin = ref<boolean>(false)
-const userInfo = ref<any>(JSON.parse(sessionStorage.getItem('userInfo')))
-if (sessionStorage.getItem('userInfo')) isLogin.value = true
+const userInfo = ref<any>()
+if (sessionStorage.getItem('userInfo')) {
+  const item: string = sessionStorage.getItem('userInfo') || ''
+  userInfo.value = JSON.parse(item)
+  isLogin.value = true
+}
 if (isLogin.value) {
   stepTitle.shift()
   stepComponent.value.shift()
   noneActionButton.value = false
 }
 
-const eventValid = ref(false)
+const eventValid = ref<boolean>(false)
 
 const callEvent = () => {
   eventValid.value = true
 }
 
-const loginParams = ref({
+const loginParams = ref<any>({
   patientNm: '',
   telNum: '',
   birth: ''
@@ -98,7 +103,10 @@ const loginParams = ref({
 
 const login = async () => {
   await apis.login(loginParams.value, store.state.siteCode)
-  userInfo.value = JSON.parse(sessionStorage.getItem('userInfo'))
+  if (sessionStorage.getItem('userInfo')) {
+    const item: string = sessionStorage.getItem('userInfo') || ''
+    userInfo.value = JSON.parse(item)
+  }
   noneActionButton.value = false
   step.value++
 }

@@ -30,7 +30,11 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-const userInfo = ref<any>(JSON.parse(sessionStorage.getItem('userInfo')))
+const userInfo = ref<any>()
+if (sessionStorage.getItem('userInfo')) {
+  const item: string = sessionStorage.getItem('userInfo') || ''
+  userInfo.value = JSON.parse(item)
+}
 
 const propsItem = defineProps({
   reservationCompleteData: {

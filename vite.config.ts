@@ -1,31 +1,33 @@
-// @ts-ignore
-// @ts-ignore
-
 import { fileURLToPath, URL } from 'node:url'
 
 import { defineConfig, loadEnv } from 'vite'
 import vue from '@vitejs/plugin-vue'
 
-// https://vitejs.dev/config/
 process.env = {
   ...process.env,
   ...loadEnv(process.env.NODE_ENV, process.cwd())
 }
 export default defineConfig(async () => ({
   define: {
-    'process.env.VITE_API_SERVER': JSON.stringify(process.env.VITE_API_SERVER)
+    'process.env.VITE_API_SERVER': JSON.stringify(process.env.VITE_API_SERVER),
+    'process.env.VITE_RPA_SERVER': JSON.stringify(process.env.VITE_RPA_SERVER)
   },
-  server: {
-    host: '0.0.0.0',
-    port: 3000,
-    proxy: {
-      '/api': {
-        target: process.env.VITE_API_SERVER,
-        changeOrigin: true,
-        secure: false
-      }
-    }
-  },
+  // server: {
+  //   host: '0.0.0.0',
+  //   port: 3000,
+  //   proxy: {
+  //     '/api': {
+  //       target: process.env.VITE_API_SERVER,
+  //       changeOrigin: true,
+  //       secure: false
+  //     },
+  //     '/rpa-server': {
+  //       target: process.env.VITE_RPA_SERVER,
+  //       changeOrigin: true,
+  //       secure: false
+  //     }
+  //   }
+  // },
   plugins: [vue()],
   resolve: {
     alias: {

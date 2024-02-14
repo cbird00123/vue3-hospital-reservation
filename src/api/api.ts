@@ -11,6 +11,10 @@ interface IResponse {
 }
 
 let response: IResponse
+let rpaResponse: any
+
+const apiBasePath: string = 'http://3.36.169.28:8100'
+const rpaBasePath: string = 'http://3.36.169.28:8500'
 
 const convertingParamsToQuerystring = (params: any) => {
   let tempString = '?'
@@ -20,7 +24,7 @@ const convertingParamsToQuerystring = (params: any) => {
   return tempString.slice(0, -1)
 }
 
-const decodeResponse = async (resBody: any) => {
+const decodeResponse = async (resBody: any, callType?: string) => {
   const reader = resBody.getReader()
   const decoder = new TextDecoder()
 
@@ -28,25 +32,35 @@ const decodeResponse = async (resBody: any) => {
     const chunk = decoder.decode(ch.value || new Uint8Array(), {
       stream: !ch.done
     })
-    response = JSON.parse(chunk)
+
+    if (callType !== 'normal') {
+      rpaResponse = JSON.parse(chunk)
+    } else {
+      response = JSON.parse(chunk)
+    }
   }
   await reader.read().then((res: any) => {
     decodeReadVal(res)
   })
 }
 
-const callFetch = async (path: string, options: any, body = {}) => {
+const callFetch = async (
+  path: string,
+  options: any,
+  body = {},
+  callType = 'normal'
+) => {
   if (body) {
     Object.assign(options, body)
   }
 
-  await fetch(path, options).then(async (res) => {
+  const originPath = (callType !== 'normal' ? rpaBasePath : apiBasePath) + path
+
+  await fetch(originPath, options).then(async (res) => {
     if (res.status === 200) {
-      await decodeResponse(res.body)
+      await decodeResponse(res.body, callType)
     }
   })
-
-  return response
 }
 
 const displayLoading = (val: string) => {
@@ -54,7 +68,31 @@ const displayLoading = (val: string) => {
   document.querySelector('.loading').style.display = val
 }
 
+const setRpaLoading = (state: boolean) => {
+  const rpaLoadingElement = document.getElementById('rpa-loading')
+  if (rpaLoadingElement) {
+    if (state) {
+      if (!rpaLoadingElement.className) {
+        rpaLoadingElement.className = 'rpa-loading-transition'
+      }
+    } else if (rpaLoadingElement.className.includes('rpa-loading-transition')) {
+      rpaLoadingElement.className = ''
+    }
+  }
+}
 const apis = {
+  aiHome: async (homeName: string, siteCode: string) => {
+    displayLoading('block')
+    await callFetch(`/api/home/${homeName}/sites/${siteCode}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+
+    displayLoading('none')
+    return response
+  },
   login: async (params: ILoginParams, siteCode: string) => {
     displayLoading('block')
     await callFetch(
@@ -116,7 +154,7 @@ const apis = {
     return response
   },
   reservation: async (params: any, siteCode: string) => {
-    displayLoading('block')
+    setRpaLoading(true)
     await callFetch(`/api/rpa/sites/${siteCode}/medical/appointment`, {
       method: 'POST',
       headers: {
@@ -124,11 +162,11 @@ const apis = {
       },
       body: JSON.stringify(params)
     })
-    displayLoading('none')
+    setRpaLoading(false)
     return response
   },
   changeReservation: async (params: any, siteCode: string) => {
-    displayLoading('block')
+    setRpaLoading(true)
     await callFetch(`/api/rpa/sites/${siteCode}/medical/appointment`, {
       method: 'PUT',
       headers: {
@@ -136,19 +174,22 @@ const apis = {
       },
       body: JSON.stringify(params)
     })
-    displayLoading('none')
+    setRpaLoading(false)
     return response
   },
   cancelReservation: async (params: any, siteCode: string) => {
-    displayLoading('block')
-    await callFetch(`/api/rpa/sites/${siteCode}/medical/appointment`, {
-      method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(params)
-    })
-    displayLoading('none')
+    const querystring = convertingParamsToQuerystring(params)
+    setRpaLoading(true)
+    await callFetch(
+      `/api/rpa/sites/${siteCode}/medical/appointment${querystring}`,
+      {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      }
+    )
+    setRpaLoading(false)
     return response
   },
   history: async (patientType: string, params: any, siteCode: string) => {
@@ -165,6 +206,21 @@ const apis = {
     )
     displayLoading('none')
     return response
+  },
+  rpaLoading: async (siteCode: string, callType: string) => {
+    await callFetch(
+      `/rpa-server/sites/${siteCode}/message/count`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      },
+      {},
+      callType
+    )
+
+    return rpaResponse
   }
 }
 
